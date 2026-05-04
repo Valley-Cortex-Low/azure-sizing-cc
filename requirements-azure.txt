@@ -1,0 +1,89 @@
+# Cortex Cloud Azure Sizing — Python dependencies
+# Install with:  pip install -r requirements-azure.txt
+#
+# Revision: v5 — Structured diagnostic schema, role-assignment-based preflight,
+#                per-resource flow log prefix fix (VNet flowLogResourceID= path),
+#                per-resource Log Source Inventory + Diagnostics Excel sheets,
+#                EH capture and flow log measured-source inventory lists,
+#                compact per-subscription console output, end-of-scan rollup.
+
+# ── Core auth + transport ────────────────────────────────────────────────────
+azure-identity
+azure-core
+azure-mgmt-core
+six
+openpyxl
+
+# ── Subscription discovery ───────────────────────────────────────────────────
+azure-mgmt-subscription
+
+# ── Cross-subscription resource discovery (VMs running state, Storage, SQL, Cosmos)
+# Resource Graph replaces per-resource ARM SDK loops for these resource types.
+# Standard ARM Reader covers all Resource Graph queries — no extra role needed.
+azure-mgmt-resourcegraph
+
+# ── Compute: VMs (ARM fallback when Resource Graph unavailable) ───────────────
+azure-mgmt-compute
+
+# ── Compute: AKS — agent pool node counts (sub-resource, not in Resource Graph)
+azure-mgmt-containerservice
+
+# ── Compute: ARO (Azure Red Hat OpenShift) ───────────────────────────────────
+azure-mgmt-redhatopenshift
+
+# ── CaaS: ACI (Azure Container Instances) ────────────────────────────────────
+azure-mgmt-containerinstance
+
+# ── CaaS: Azure Container Apps ───────────────────────────────────────────────
+azure-mgmt-appcontainers
+
+# ── Serverless: Azure Functions
+# microsoft.web/sites/functions is not a Resource Graph resource type.
+# Actual function count per app requires the ARM /sites/{app}/functions endpoint.
+azure-mgmt-web
+
+# ── Databases: Azure SQL (ARM fallback only — primary is Resource Graph) ──────
+azure-mgmt-sql
+
+# ── Databases: Cosmos DB (ARM fallback only — primary is Resource Graph) ──────
+azure-mgmt-cosmosdb
+
+# ── Storage Accounts (ARM fallback only — primary is Resource Graph) ──────────
+azure-mgmt-storage
+
+# ── Container Images: ACR management plane ───────────────────────────────────
+azure-mgmt-containerregistry
+
+# ── Container Images: ACR data plane (list repositories + manifests)
+# Tag and manifest counts live behind the registry data plane.
+# ARM management plane only knows the registry exists.
+azure-containerregistry
+
+# ── Log sources: NSG / VNet Flow Logs + diagnostic settings ──────────────────
+azure-mgmt-network
+azure-mgmt-monitor
+azure-mgmt-dns
+azure-mgmt-privatedns
+azure-mgmt-eventhub
+
+# ── Log Analytics Workspace (LAW) management plane + KQL query ────────────────
+# Management plane: list workspaces, discover diagnostic setting sinks.
+# Query API uses requests directly (api.loganalytics.io — separate OAuth2 audience).
+azure-mgmt-loganalytics
+
+# ── Log ingestion: Event Hub capture blobs + VNet/NSG flow-log blobs ──────────
+# Flow log blobs are listed using exact path prefixes written by Azure Network
+# Watcher:
+#   VNet flow logs: flowLogResourceID=/{sub}_{NW-RG}/{watcher}_{flowlog-name}/...
+#   NSG flow logs:  resourceId=/SUBSCRIPTIONS/{sub}/RESOURCEGROUPS/...
+# Log Analytics KQL queries issued via requests to api.loganalytics.io.
+azure-storage-blob
+
+# ── Tenant scan: Microsoft Graph API (Entra ID user counts only) ─────────────
+# Microsoft Graph ≠ Azure Resource Graph.
+# Graph API is used exclusively for directory objects (users).
+# Resource inventory uses ARM / Resource Graph, not Microsoft Graph.
+# Also used for: EH capture destination REST calls, LAW query API calls,
+# ARM REST calls that bypass SDK deserialization gaps (EH hub details),
+# role-assignment API calls (principalId filter for preflight check).
+requests
