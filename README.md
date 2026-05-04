@@ -3,8 +3,13 @@
 Pre-sales sizing toolkit for Microsoft Azure. Scans all subscriptions in a tenant and produces per-subscription workload SKU breakdowns, log ingestion measurements, a structured diagnostic report, and an Excel workbook ready for sizing conversations.
 
 ---
+## Quick Start - Cloud Shell
+```bash
+curl -sL https://raw.githubusercontent.com/Valley-Cortex-Low/azure-sizing-cc/main/run-sizing.sh -o run-sizing.sh && chmod +x run-sizing.sh && ./run-sizing.sh
+```
 
-## Quick Start
+`run-sizing.sh` handles everything end-to-end: virtualenv setup, authentication, preflight, multi-pass scanning, tenant scan, and workbook generation. See [Environment Variables](#environment-variables) for optional overrides.
+## Quick Start - Download Files locally
 
 ```bash
 chmod +x run-sizing.sh
